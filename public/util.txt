@@ -1,0 +1,1 @@
+//"proxy": "https://us-central1-bazarano-1b9da.cloudfunctions.net/api"
