@@ -58,6 +58,9 @@ export class productUpload extends Component {
 
   handleSubmit = (event) => {
     event.preventDefault();
+    this.setState({
+      loading: true,
+    });
 
     const newProduct = {
       title: this.state.title,
@@ -71,8 +74,15 @@ export class productUpload extends Component {
       .post("/postNewProduct", newProduct)
       .then((res) => {
         console.log(`"Product uploaded successfully">>> ${res.data.imageUrl}`);
+        this.setState({
+          loading: false,
+        });
       })
       .catch((err) => {
+        this.setState({
+          errors: err.response.data,
+          loading: false,
+        });
         console.log("Product Upload Error >>>> ${err}" + err);
       });
   };
@@ -83,6 +93,9 @@ export class productUpload extends Component {
     });
 
     const image = event.target.files[0];
+    this.setState({
+      image: URL.createObjectURL(image),
+    });
     const formdata = new FormData();
     formdata.append("file", image, image.name);
 
@@ -91,14 +104,14 @@ export class productUpload extends Component {
       .then((res) => {
         this.setState({
           loading: false,
-          image: `${res.data.imageUrl}`,
+          // image: `${res.data.imageUrl}`,
         });
         console.log(`"image uploaded successfully">>> ${res.data.imageUrl}`);
       })
       .catch((err) => {
         this.setState({
           loading: false,
-          // errors: err.response.data,
+          errors: err.response.data,
         });
         console.log("Error >>>> ${err}" + err);
       });
@@ -119,7 +132,7 @@ export class productUpload extends Component {
 
   render() {
     const { classes } = this.props;
-    const { errors, loading } = this.state;
+    const { errors, loading, image } = this.state;
     return (
       <Paper className={mergeClasses.paper}>
         <div>
@@ -133,8 +146,8 @@ export class productUpload extends Component {
               <form noValidate onSubmit={this.handleSubmit}>
                 <div>
                   <img
-                    src="http://www.amityinternational.com/wp-content/uploads/2019/02/product-placeholder.jpg"
-                    alt="This a photo of a product"
+                    src={image}
+                    alt="Preview Image"
                     height="150"
                     width="150"
                   ></img>
@@ -144,6 +157,13 @@ export class productUpload extends Component {
                     hidden="hidden"
                     onChange={this.handleImageChange}
                   ></input>
+
+                  {errors.imageUrl && (
+                    <Typography variant="body2" className={classes.customError}>
+                      {errors.imageUrl}
+                    </Typography>
+                  )}
+
                   <Tooltip title="Add Product Image" placement="top_right">
                     <IconButton
                       encType="multipart/formdata"
@@ -197,6 +217,9 @@ export class productUpload extends Component {
                   className={classes.button}
                 >
                   Upload
+                  {loading && (
+                    <CircularProgress size={30} className={classes.progress} />
+                  )}
                 </Button>
               </form>
             </Grid>
