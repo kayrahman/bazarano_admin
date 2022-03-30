@@ -11,6 +11,7 @@ import NavBar from "./components/navbar";
 import Home from "./pages/home";
 import Login from "./pages/login";
 import ProductUpload from "./pages/productUpload";
+import Album from "./pages/Album";
 
 const theme = CreateMuiTheme({
   palette: {
@@ -41,6 +42,7 @@ class App extends Component {
                 <Route path="/" element={<Home />} />
                 <Route path="/productUpload" element={<ProductUpload />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/productList" element={<Album />} />
               </Routes>
             </div>
           </Router>

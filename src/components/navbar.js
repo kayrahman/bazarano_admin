@@ -18,6 +18,9 @@ class navbar extends Component {
           <Button color="inherit" component={Link} to="/productUpload">
             Upload
           </Button>
+          <Button color="inherit" component={Link} to="/productList">
+            Products
+          </Button>
         </Toolbar>
       </AppBar>
     );

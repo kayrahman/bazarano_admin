@@ -2,10 +2,18 @@ import React, { Component } from "react";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
 //MUI
+import { useTheme } from "@mui/material/styles";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import Tooltip from "@material-ui/core/Tooltip";
 import IconButton from "@material-ui/core/IconButton";
+import MenuItem from "@mui/material/MenuItem";
+
+import OutlinedInput from "@mui/material/OutlinedInput";
+import InputLabel from "@mui/material/InputLabel";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+
 //ICONS
 import EditIcon from "@material-ui/icons/Add";
 import withStyles from "@material-ui/core/styles/withStyles";
@@ -17,6 +25,10 @@ import { mergeClasses } from "@material-ui/styles";
 const styles = {
   form: {
     textAlign: "center",
+  },
+
+  container: {
+    backgroundColor: "#fff",
   },
 
   pageTitle: {
@@ -43,6 +55,51 @@ const styles = {
   },
 };
 
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+  anchorOrigin: {
+    vertical: "bottom",
+    horizontal: "left",
+  },
+  transformOrigin: {
+    vertical: "top",
+    horizontal: "left",
+  },
+  getContentAnchorEl: null,
+};
+
+const names = [
+  "Foods & Drinks",
+  "Leather",
+  "Handmade",
+  "Fruits & Vegetables",
+  "Home Garden",
+  "Men",
+  "Biscuits & Cake",
+  "Sports",
+  "Milk & Dairy",
+  "Electronics",
+  "Grocery",
+  "Pharmaceutical",
+  "Cooking",
+];
+
+function getStyles(name, personName, theme) {
+  return {
+    fontWeight:
+      personName.indexOf(name) === -1
+        ? theme.typography.fontWeightRegular
+        : theme.typography.fontWeightMedium,
+  };
+}
+
 export class productUpload extends Component {
   constructor() {
     super();
@@ -53,6 +110,8 @@ export class productUpload extends Component {
       loading: false,
       errors: {},
       image: "",
+      response: {},
+      personName: [],
     };
   }
 
@@ -76,6 +135,7 @@ export class productUpload extends Component {
         console.log(`"Product uploaded successfully">>> ${res.data.imageUrl}`);
         this.setState({
           loading: false,
+          response: res.data,
         });
       })
       .catch((err) => {
@@ -104,7 +164,7 @@ export class productUpload extends Component {
       .then((res) => {
         this.setState({
           loading: false,
-          // image: `${res.data.imageUrl}`,
+          image: `${res.data.imageUrl}`,
         });
         console.log(`"image uploaded successfully">>> ${res.data.imageUrl}`);
       })
@@ -130,26 +190,42 @@ export class productUpload extends Component {
     });
   };
 
+  // const [personName, setPersonName] = React.useState([]);
+
+  // const handleChange = (event) => {
+  //   const {
+  //     target: { value },
+  //   } = event;
+  //   setPersonName(
+  //     // On autofill we get a stringified value.
+  //     typeof value === 'string' ? value.split(',') : value,
+  //   );
+  // };
+
   render() {
     const { classes } = this.props;
-    const { errors, loading, image } = this.state;
+    const { errors, loading, image, response, categoryTitle, personName } =
+      this.state;
+    const placeholder = "../public/logo192.png";
     return (
-      <Paper className={mergeClasses.paper}>
-        <div>
-          <Grid container>
-            <Grid item sm />
-            <Grid item sm>
-              <Typography variant="h3">
-                <p>Product Upload</p>
-              </Typography>
+      <div>
+        <Grid container className={classes.form}>
+          <Grid item sm />
+          <Grid item sm>
+            <Typography variant="h4" align="center" gutterBottom>
+              <p>Product Upload</p>
+            </Typography>
 
+            <Grid item sm>
               <form noValidate onSubmit={this.handleSubmit}>
                 <div>
                   <img
                     src={image}
+                    // src="https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.posterprintfactory.com%2Fphoto_tiles%2Fnew&psig=AOvVaw3lshfRv2zKcNLspb6KuGNL&ust=1648647670937000&source=images&cd=vfe&ved=0CAsQjRxqFwoTCMiB96256_YCFQAAAAAdAAAAABAD"
                     alt="Preview Image"
                     height="150"
                     width="150"
+                    placeholder="https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.posterprintfactory.com%2Fphoto_tiles%2Fnew&psig=AOvVaw3lshfRv2zKcNLspb6KuGNL&ust=1648647670937000&source=images&cd=vfe&ved=0CAsQjRxqFwoTCMiB96256_YCFQAAAAAdAAAAABAD"
                   ></img>
                   <input
                     type="file"
@@ -174,41 +250,96 @@ export class productUpload extends Component {
                   </Tooltip>
                 </div>
 
-                <TextField
-                  id="title"
-                  name="title"
-                  type="email"
-                  label="Title"
-                  onChange={this.handleChange}
-                  fullWidth
-                  className={classes.textField}
-                  helperText={errors.title}
-                  error={errors.title ? true : false}
-                />
+                <FormControl sx={{ m: 1, width: 400 }}>
+                  <TextField
+                    id="title"
+                    name="title"
+                    type="email"
+                    label="Title"
+                    onChange={this.handleChange}
+                    fullWidth
+                    className={classes.textField}
+                    helperText={errors.title}
+                    error={errors.title ? true : false}
+                    variant="outlined"
+                  />
+                </FormControl>
+                <FormControl sx={{ m: 1, width: 400 }}>
+                  <TextField
+                    id="price"
+                    name="price"
+                    type="number"
+                    label="Price"
+                    onChange={this.handleChange}
+                    fullWidth
+                    className={classes.textField}
+                    helperText={errors.price}
+                    error={errors.price ? true : false}
+                    variant="outlined"
+                  />
+                </FormControl>
 
-                <TextField
-                  id="price"
-                  name="price"
-                  type="price"
-                  label="Price"
-                  onChange={this.handleChange}
-                  fullWidth
-                  className={classes.textField}
-                  helperText={errors.price}
-                  error={errors.price ? true : false}
-                />
+                <div>
+                  <FormControl sx={{ m: 1, minWidth: 400 }}>
+                    <InputLabel id="demo-multiple-name-label">
+                      Category
+                    </InputLabel>
+                    <Select
+                      labelId="demo-multiple-name-label"
+                      id="categoryTitle"
+                      name="categoryTitle"
+                      value={categoryTitle}
+                      onChange={this.handleChange}
+                      helperText={errors.category}
+                      error={errors.category ? true : false}
+                      input={<OutlinedInput label="Name" />}
+                      MenuProps={{
+                        anchorOrigin: {
+                          vertical: "bottom",
+                          horizontal: "left",
+                        },
+                        transformOrigin: {
+                          vertical: "top",
+                          horizontal: "left",
+                        },
+                        getContentAnchorEl: null,
+                      }}
+                    >
+                      {names.map((name) => (
+                        <MenuItem
+                          key={name}
+                          value={name}
+                          // style={getStyles(name, personName, theme)}
+                        >
+                          {name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </div>
 
-                <TextField
-                  id="category"
-                  name="categoryTitle"
-                  type="price"
-                  label="Category"
-                  onChange={this.handleChange}
-                  fullWidth
-                  className={classes.textField}
-                  helperText={errors.category}
-                  error={errors.category ? true : false}
-                />
+                <FormControl sx={{ m: 1, width: 400 }}>
+                  <TextField
+                    id="description"
+                    name="description"
+                    type="desciption"
+                    label="Description"
+                    onChange={this.handleChange}
+                    fullWidth
+                    className={classes.textField}
+                    helperText={errors.description}
+                    error={errors.description ? true : false}
+                    variant="outlined"
+                    multiline
+                    rows={4}
+                  />
+                </FormControl>
+
+                {response.message && (
+                  <Typography variant="body2" color={"primary"}>
+                    {response.message}
+                  </Typography>
+                )}
 
                 <Button
                   type="submit"
@@ -223,10 +354,10 @@ export class productUpload extends Component {
                 </Button>
               </form>
             </Grid>
-            <Grid item sm />
           </Grid>
-        </div>
-      </Paper>
+          <Grid item sm />
+        </Grid>
+      </div>
     );
   }
 }
