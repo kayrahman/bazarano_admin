@@ -36,12 +36,6 @@ const styles = {
   },
 
   textField: {
-    margin: "10px auto 10px auto",
-  },
-
-  button: {
-    marginTop: 20,
-    marginBottom: 20,
     position: "relative",
   },
 
@@ -109,9 +103,12 @@ export class productUpload extends Component {
       categoryTitle: "",
       loading: false,
       errors: {},
-      image: "",
+      // image: `http://firebasestorage.googleapis.com/v0/b/https://console.firebase.google.com/project/bazarano-1b9da/storage/bazarano-1b9da.appspot.com/files/o/${https://firebasestorage.googleapis.com/v0/b/bazarano-1b9da.appspot.com/o/productPictures%2F176896d6-bedd-3a05-9ef4-845300277e21?alt=media&token=28f88707-a56e-4a74-a929-af71304ea6ad}?alt=med`,
+      // image: `https://firebasestorage.googleapis.com/v0/b/bazarano-1b9da.appspot.com/o/productPictures%2F176896d6-bedd-3a05-9ef4-845300277e21?alt=media&token=28f88707-a56e-4a74-a929-af71304ea6ad?alt=med`,
+      image: "./logo192.png",
       response: {},
       personName: [],
+      thumbImage: "",
     };
   }
 
@@ -127,7 +124,7 @@ export class productUpload extends Component {
       price: this.state.price,
       categoryTitle: this.state.categoryTitle,
       uid: "ialikdf59873928ursdnvkldsh902358gfdkl",
-      imageUrl: this.state.image,
+      imageUrl: this.state.thumbImage,
     };
     axios
       .post("/postNewProduct", newProduct)
@@ -155,6 +152,7 @@ export class productUpload extends Component {
     const image = event.target.files[0];
     this.setState({
       image: URL.createObjectURL(image),
+      thumbImage: URL.createObjectURL(image),
     });
     const formdata = new FormData();
     formdata.append("file", image, image.name);
@@ -164,7 +162,8 @@ export class productUpload extends Component {
       .then((res) => {
         this.setState({
           loading: false,
-          image: `${res.data.imageUrl}`,
+          // image: `${res.data.imageUrl}`,
+          thumbImage: `${res.data.imageUrl}`,
         });
         console.log(`"image uploaded successfully">>> ${res.data.imageUrl}`);
       })
@@ -206,26 +205,23 @@ export class productUpload extends Component {
     const { classes } = this.props;
     const { errors, loading, image, response, categoryTitle, personName } =
       this.state;
-    const placeholder = "../public/logo192.png";
+
     return (
       <div>
         <Grid container className={classes.form}>
           <Grid item sm />
           <Grid item sm>
-            <Typography variant="h4" align="center" gutterBottom>
-              <p>Product Upload</p>
-            </Typography>
-
             <Grid item sm>
+              <Typography variant="h5" align="center" gutterBottom>
+                <p>Add New Product</p>
+              </Typography>
               <form noValidate onSubmit={this.handleSubmit}>
                 <div>
                   <img
                     src={image}
-                    // src="https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.posterprintfactory.com%2Fphoto_tiles%2Fnew&psig=AOvVaw3lshfRv2zKcNLspb6KuGNL&ust=1648647670937000&source=images&cd=vfe&ved=0CAsQjRxqFwoTCMiB96256_YCFQAAAAAdAAAAABAD"
                     alt="Preview Image"
                     height="150"
                     width="150"
-                    placeholder="https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.posterprintfactory.com%2Fphoto_tiles%2Fnew&psig=AOvVaw3lshfRv2zKcNLspb6KuGNL&ust=1648647670937000&source=images&cd=vfe&ved=0CAsQjRxqFwoTCMiB96256_YCFQAAAAAdAAAAABAD"
                   ></img>
                   <input
                     type="file"
@@ -346,6 +342,7 @@ export class productUpload extends Component {
                   variant="contained"
                   color="primary"
                   className={classes.button}
+                  disabled={loading}
                 >
                   Upload
                   {loading && (
